@@ -14,10 +14,10 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWords("dicNew40k.txt");//здесь пишешь название файла-словаря
+            Matrix.dicWords = Matrix.GetDicWords("NotBadDic457k.txt");//здесь пишешь название файла-словаря
             SortWords(Matrix.dicWords, 4, 6, 8, 10, 12);//здесь пишется длина всех встречающихся слов (это вся)
 
-            DecryptHaHa(3, Matrix.GetStartWords("start.txt"));//здесь число - количество потоков
+            DecryptHaHa(1, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
 
             StrucFiles();
 
