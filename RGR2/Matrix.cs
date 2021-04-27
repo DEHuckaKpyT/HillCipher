@@ -25,24 +25,24 @@ namespace RGR2
         {
             Console.WriteLine($"{number + 1}.{word}");
             Directory.CreateDirectory("EncryptedWords");
-            using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))//для записи найденных слов
+            using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))
             {
-                foreach (var enWord in GetLenghtWords(word.Length))//перебираем по одному расшифрованному слову
+                foreach (var enWord in GetLenghtWords(word.Length))
                 {
-                    List<int[,]> matrixes = GetMatrixes(enWord);//получаем матрицы 1х2
+                    List<int[,]> matrixes = GetMatrixes(enWord);
                     Console.WriteLine(enWord);
                     foreach (int[,] matrix in allMatrixes)
                     {
-                        string testWord = "";//для записи в него текущего варианта зашифрованного слова
+                        string testWord = "";
 
-                        foreach (var i in matrixes)//идём по каждой матрице 1х2
+                        foreach (var i in matrixes)
                         {
-                            int[,] c = MatrixMultiplication(i, matrix);//перемножаем матрицы 2х2 и 1х2
-                            testWord += (char)((c[0, 0] % 26) + 97);//получаем два зашифрованных символа
-                            testWord += (char)((c[0, 1] % 26) + 97);//записываем их в текущее зашифрованное слово
-                            if (!word.Substring(0, testWord.Length).Equals(testWord)) break;//если начало шифрограммы не совпадает с началом текущего зашифрованного слова, то берём следущую матрицу
+                            int[,] c = MatrixMultiplication(i, matrix);
+                            testWord += (char)((c[0, 0] % 26) + 97);
+                            testWord += (char)((c[0, 1] % 26) + 97);
+                            if (!word.Substring(0, testWord.Length).Equals(testWord)) break;
                         }
-                        if (word.Equals(testWord))//если слова одинаковвые, то записываем
+                        if (word.Equals(testWord))
                         {
                             Console.WriteLine($"{enWord} {matrix[0,0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                             streamWriter.WriteLine($"{enWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
@@ -60,7 +60,7 @@ namespace RGR2
                     words.Add(streamReader.ReadLine().ToLower());
             return words;
         }
-        public static string[] GetDicWords(string path)//метод для считывания всех слов словаря
+        public static string[] GetDicWords(string path)
         {
             List<string> words = new List<string>();
             using (StreamReader streamReader = new StreamReader(path))
@@ -68,7 +68,7 @@ namespace RGR2
                     words.Add(streamReader.ReadLine().ToLower());
             return words.ToArray();
         }
-        public static string[] GetStartWords(string path)//метод для считывания с файла зашифрованных слов
+        public static string[] GetStartWords(string path)
         {
             List<string> startWords = new List<string>();
             using (StreamReader stream = new StreamReader(path))
@@ -107,20 +107,6 @@ namespace RGR2
                 }
             }
             return matrixC;
-        }
-    }
-    static class MatrixExt
-    {
-        // метод расширения для получения количества строк матрицы
-        public static int RowsCount(this int[,] matrix)
-        {
-            return matrix.GetUpperBound(0) + 1;
-        }
-
-        // метод расширения для получения количества столбцов матрицы
-        public static int ColumnsCount(this int[,] matrix)
-        {
-            return matrix.GetUpperBound(1) + 1;
         }
     }
 }
