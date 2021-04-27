@@ -14,10 +14,11 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWords("dicNew40k.txt");//здесь пишешь название файла-словаря
+            Matrix.dicWords = Matrix.GetDicWords("NotBadDic457k.txt");//здесь пишешь название файла-словаря
             SortWords(Matrix.dicWords, 4, 6, 8, 10, 12);//здесь пишется длина всех встречающихся слов (это вся)
+            Matrix.allMatrixes = GetEncryptMatrixes();
 
-            DecryptHaHa(3, Matrix.GetStartWords("start.txt"));//здесь число - количество потоков
+            DecryptHaHa(1, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
 
             StrucFiles();
 
@@ -48,6 +49,18 @@ namespace RGR2
             }
 
             WaitHandle.WaitAll(events);
+        }
+        static List<int[,]> GetEncryptMatrixes()
+        {
+            List<int[,]> matrixes = new List<int[,]>();
+            for (int i1 = 0; i1 < 26; i1++)//перебор всех матриц 2х2 с числами от 0 до 25
+                for (int i2 = 0; i2 < 26; i2++)
+                    for (int i3 = 0; i3 < 26; i3++)
+                        for (int i4 = 0; i4 < 26; i4++)
+                        {
+                            matrixes.Add(new int[2, 2] { { i1, i2 }, { i3, i4 } });
+                        }
+            return matrixes;
         }
         static void SortWords(string[] wordsList, params int[] lengths)
         {

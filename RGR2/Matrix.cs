@@ -14,6 +14,7 @@ namespace RGR2
         int number;
         string word;
         public static string[] dicWords;
+        public static List<int[,]> allMatrixes;
         public Matrix(ManualResetEvent eve, int num, string wrd)
         {
             ev = eve;
@@ -22,8 +23,6 @@ namespace RGR2
         }
         public void CheckWord()
         {
-            int[,] a = new int[2, 2] { { 0, 0 }, { 0, 0 } };//по условию создаём матрицу 2х2
-
             Console.WriteLine($"{number + 1}.{word}");
             Directory.CreateDirectory("EncryptedWords");
             using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))//для записи найденных слов
@@ -32,30 +31,23 @@ namespace RGR2
                 {
                     List<int[,]> matrixes = GetMatrixes(enWord);//получаем матрицы 1х2
                     Console.WriteLine(enWord);
-                    for (int i1 = 0; i1 < 26; i1++)//перебор всех матриц 2х2 с числами от 0 до 25
-                        for (int i2 = 0; i2 < 26; i2++)
-                            for (int i3 = 0; i3 < 26; i3++)
-                                for (int i4 = 0; i4 < 26; i4++)
-                                {
-                                    a[0, 0] = i1;
-                                    a[0, 1] = i2;
-                                    a[1, 0] = i3;
-                                    a[1, 1] = i4;
-                                    string testWord = "";//для записи в него текущего варианта зашифрованного слова
+                    foreach (int[,] matrix in allMatrixes)
+                    {
+                        string testWord = "";//для записи в него текущего варианта зашифрованного слова
 
-                                    foreach (var i in matrixes)//идём по каждой матрице 1х2
-                                    {
-                                        int[,] c = MatrixMultiplication(i, a);//перемножаем матрицы 2х2 и 1х2
-                                        testWord += (char)((c[0, 0] % 26) + 97);//получаем два зашифрованных символа
-                                        testWord += (char)((c[0, 1] % 26) + 97);//записываем их в текущее зашифрованное слово
-                                        if (!word.Substring(0, testWord.Length).Equals(testWord)) break;//если начало шифрограммы не совпадает с началом текущего зашифрованного слова, то берём следущую матрицу
-                                    }
-                                    if (word.Equals(testWord))//если слова одинаковвые, то записываем
-                                    {
-                                        Console.WriteLine($"{enWord} {i1} {i2} {i3} {i4}");
-                                        streamWriter.WriteLine($"{enWord} {i1} {i2} {i3} {i4}");
-                                    }
-                                }
+                        foreach (var i in matrixes)//идём по каждой матрице 1х2
+                        {
+                            int[,] c = MatrixMultiplication(i, matrix);//перемножаем матрицы 2х2 и 1х2
+                            testWord += (char)((c[0, 0] % 26) + 97);//получаем два зашифрованных символа
+                            testWord += (char)((c[0, 1] % 26) + 97);//записываем их в текущее зашифрованное слово
+                            if (!word.Substring(0, testWord.Length).Equals(testWord)) break;//если начало шифрограммы не совпадает с началом текущего зашифрованного слова, то берём следущую матрицу
+                        }
+                        if (word.Equals(testWord))//если слова одинаковвые, то записываем
+                        {
+                            Console.WriteLine($"{enWord} {matrix[0,0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                            streamWriter.WriteLine($"{enWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                        }
+                    }
                 }
             }
             ev.Set();
