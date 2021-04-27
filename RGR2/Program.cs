@@ -1,0 +1,161 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace RGR2
+{
+    class Program
+    {
+        static ManualResetEvent[] events;
+        static void Main(string[] args)
+        {
+            CommitNowTime();
+            Matrix.dicWords = Matrix.GetDicWords("dicNew40k.txt");//здесь пишешь название файла-словаря
+            SortWords(Matrix.dicWords, 4, 6, 8, 10, 12);//здесь пишется длина всех встречающихся слов (это вся)
+
+            DecryptHaHa(3, Matrix.GetStartWords("start.txt"));//здесь число - количество потоков
+
+            StrucFiles();
+
+            Console.WriteLine("End");
+            CommitNowTime();
+            ConsoleKeyInfo key = Console.ReadKey();
+            while(key.Key!=ConsoleKey.Escape)
+                key = Console.ReadKey();
+        }
+        static void DecryptHaHa(int coresCount, string[] startWords)
+        {
+            int streamsCount = coresCount < startWords.Length ? coresCount : startWords.Length;
+            events = new ManualResetEvent[streamsCount];
+
+            for (int i = 0; i < streamsCount; i++)
+            {
+                events[i] = new ManualResetEvent(false);
+                Matrix matrix = new Matrix(events[i], i, startWords[i]);
+                new Thread(new ThreadStart(matrix.CheckWord)).Start();
+            }
+
+            for (int i = streamsCount; i < startWords.Length; i++)
+            {
+                int numb = WaitHandle.WaitAny(events);
+                events[numb].Reset();
+                Matrix matrix = new Matrix(events[numb], i, startWords[i]);
+                new Thread(new ThreadStart(matrix.CheckWord)).Start();
+            }
+
+            WaitHandle.WaitAll(events);
+        }
+        static void SortWords(string[] wordsList, params int[] lengths)
+        {
+            Dictionary<int, List<string>> lenWords = new Dictionary<int, List<string>>();
+            int maxLenght = lengths.Max();
+
+            for (int i = 1; i <= maxLenght; i++)
+                lenWords.Add(i, new List<string>());
+
+            foreach (string word in wordsList)
+                if (word.Length <= maxLenght) lenWords[word.Length].Add(word);
+
+            foreach (var i in lengths)
+            {
+                lenWords[i].Sort();
+                WriteWords(lenWords[i], i);
+            }
+        }
+        static void WriteWords(List<string> words, int len)
+        {
+            Directory.CreateDirectory("temp");
+            using (StreamWriter streamWriter = new StreamWriter($"temp\\Lenght{len}.txt", false, Encoding.ASCII))
+            {
+                foreach (string word in words)
+                    streamWriter.WriteLine(word);
+            }
+        }
+        static void CommitNowTime()
+        {
+            Console.WriteLine(DateTime.Now);
+            using (StreamWriter stream = new StreamWriter("Time.txt", true))
+                stream.WriteLine(DateTime.Now);
+        }
+        static void StrucFiles()
+        {
+            DirectoryInfo dir = new DirectoryInfo("EncryptedWords");
+            var files = dir.GetFiles().OrderBy(x => int.Parse(x.Name.Substring(0,x.Name.IndexOf('.'))));
+
+            Directory.CreateDirectory("Total");
+            using (StreamWriter stream = new StreamWriter("Total\\EnWords.txt", false))
+                foreach (var file in files)
+                    RewriteFiles(stream, file.FullName, file.Name);
+        }
+        static void RewriteFiles(StreamWriter writer, string path, string name)
+        {
+            List<string> strings = new List<string>();
+            using (StreamReader stream = new StreamReader(path))
+                while (!stream.EndOfStream)
+                    strings.Add(stream.ReadLine());
+
+            SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
+            foreach (var str in strings)
+            {
+                string[] strs = str.Split(' ');
+                if (!dic.ContainsKey(strs[0]))
+                    dic.Add(strs[0], "{" + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}");
+                else
+                    dic[strs[0]] = dic[strs[0]].Replace("}", "") + ", " + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}";
+            }
+
+            Directory.CreateDirectory("EncryptedStructuredWords");
+            writer.WriteLine(name.Replace(".txt", ""));
+            using (StreamWriter stream = new StreamWriter($"EncryptedStructuredWords\\{name}", false))
+                foreach (var i in dic)
+                {
+                    stream.WriteLine(i.Key + " " + i.Value);
+                    writer.WriteLine(i.Key);
+                }
+        }
+        static void CheckWord(int number, string path, string word)
+        {
+            int[,] a = new int[2, 2] { { 0, 0 }, { 0, 0 } };//по условию создаём матрицу 2х2
+            string[] allWords = Matrix.GetDicWords(path);//считываем словарь
+
+            using (StreamWriter streamWriter = new StreamWriter($"{number}.{word}.txt", false, Encoding.ASCII))//для записи найденных слов
+            {
+                streamWriter.WriteLineAsync($"{word}");
+                foreach (var enWord in allWords)//перебираем по одному расшифрованному слову
+                {
+                    List<int[,]> matrixes = Matrix.GetMatrixes(enWord);//получаем матрицы 1х2
+                    Console.WriteLine(enWord);
+                    for (int i1 = 0; i1 < 26; i1++)//перебор всех матриц 2х2 с числами от 0 до 25
+                        for (int i2 = 0; i2 < 26; i2++)
+                            for (int i3 = 0; i3 < 26; i3++)
+                                for (int i4 = 0; i4 < 26; i4++)
+                                {
+                                    a[0, 0] = i1;
+                                    a[0, 1] = i2;
+                                    a[1, 0] = i3;
+                                    a[1, 1] = i4;
+                                    string testWord = "";//для записи в него текущего варианта зашифрованного слова
+
+                                    foreach (var i in matrixes)//идём по каждой матрице 1х2
+                                    {
+                                        int[,] c = Matrix.MatrixMultiplication(i, a);//перемножаем матрицы 2х2 и 1х2
+                                        testWord += (char)((c[0, 0] % 26) + 97);//получаем два зашифрованных символа
+                                        testWord += (char)((c[0, 1] % 26) + 97);//записываем их в текущее зашифрованное слово
+                                        if (!word.Substring(0, testWord.Length).Equals(testWord)) break;//если начало шифрограммы не совпадает с началом текущего зашифрованного слова, то берём следущую матрицу
+                                    }
+                                    if (word.Length == testWord.Length)//если слова одинаковвые, то записываем
+                                    {
+                                        Console.WriteLine($"{i1} {i2} {i3} {i4} {enWord}");
+                                        streamWriter.WriteLine($"{i1} {i2} {i3} {i4} {enWord}");
+                                    }
+                                }
+                }
+            }
+
+        }
+    }
+}
