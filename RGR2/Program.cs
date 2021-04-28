@@ -28,9 +28,9 @@ namespace RGR2
             while(key.Key!=ConsoleKey.Escape)
                 key = Console.ReadKey();
         }
-        static void DecryptHaHa(int coresCount, string[] startWords)
+        static void DecryptHaHa(int streamsCount, string[] startWords)
         {
-            int streamsCount = coresCount < startWords.Length ? coresCount : startWords.Length;
+            streamsCount = streamsCount < startWords.Length ? streamsCount : startWords.Length;
             events = new ManualResetEvent[streamsCount];
 
             for (int i = 0; i < streamsCount; i++)
@@ -127,46 +127,6 @@ namespace RGR2
                     stream.WriteLine(i.Key + " " + i.Value);
                     writer.WriteLine(i.Key);
                 }
-        }
-        static void CheckWord(int number, string path, string word)
-        {
-            int[,] a = new int[2, 2] { { 0, 0 }, { 0, 0 } };//по условию создаём матрицу 2х2
-            string[] allWords = Matrix.GetDicWords(path);//считываем словарь
-
-            using (StreamWriter streamWriter = new StreamWriter($"{number}.{word}.txt", false, Encoding.ASCII))//для записи найденных слов
-            {
-                streamWriter.WriteLineAsync($"{word}");
-                foreach (var enWord in allWords)//перебираем по одному расшифрованному слову
-                {
-                    List<int[,]> matrixes = Matrix.GetMatrixes(enWord);//получаем матрицы 1х2
-                    Console.WriteLine(enWord);
-                    for (int i1 = 0; i1 < 26; i1++)//перебор всех матриц 2х2 с числами от 0 до 25
-                        for (int i2 = 0; i2 < 26; i2++)
-                            for (int i3 = 0; i3 < 26; i3++)
-                                for (int i4 = 0; i4 < 26; i4++)
-                                {
-                                    a[0, 0] = i1;
-                                    a[0, 1] = i2;
-                                    a[1, 0] = i3;
-                                    a[1, 1] = i4;
-                                    string testWord = "";//для записи в него текущего варианта зашифрованного слова
-
-                                    foreach (var i in matrixes)//идём по каждой матрице 1х2
-                                    {
-                                        int[,] c = Matrix.MatrixMultiplication(i, a);//перемножаем матрицы 2х2 и 1х2
-                                        testWord += (char)((c[0, 0] % 26) + 97);//получаем два зашифрованных символа
-                                        testWord += (char)((c[0, 1] % 26) + 97);//записываем их в текущее зашифрованное слово
-                                        if (!word.Substring(0, testWord.Length).Equals(testWord)) break;//если начало шифрограммы не совпадает с началом текущего зашифрованного слова, то берём следущую матрицу
-                                    }
-                                    if (word.Length == testWord.Length)//если слова одинаковвые, то записываем
-                                    {
-                                        Console.WriteLine($"{i1} {i2} {i3} {i4} {enWord}");
-                                        streamWriter.WriteLine($"{i1} {i2} {i3} {i4} {enWord}");
-                                    }
-                                }
-                }
-            }
-
         }
     }
 }

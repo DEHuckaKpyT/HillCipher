@@ -109,4 +109,18 @@ namespace RGR2
             return matrixC;
         }
     }
+    static class MatrixExt
+    {
+        // метод расширения для получения количества строк матрицы
+        public static int RowsCount(this int[,] matrix)
+        {
+            return matrix.GetUpperBound(0) + 1;
+        }
+
+        // метод расширения для получения количества столбцов матрицы
+        public static int ColumnsCount(this int[,] matrix)
+        {
+            return matrix.GetUpperBound(1) + 1;
+        }
+    }
 }
