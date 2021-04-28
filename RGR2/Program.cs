@@ -14,7 +14,7 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWordsAndSort("dic10k.txt");
+            Matrix.dicWords = Matrix.GetDicWordsAndSort("sources\\NotBadDic457k.txt");
             SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
             Matrix.allMatrixes = GetDecryptMatrixes();
 
@@ -66,7 +66,7 @@ namespace RGR2
             string[] tempStrings;
             int[,] tempMatrix;
 
-            using (StreamReader reader = new StreamReader("DecryptMatrixes.txt"))
+            using (StreamReader reader = new StreamReader("sources\\DecryptMatrixes.txt"))
                 while (!reader.EndOfStream)
                 {
                     tempStrings = reader.ReadLine().Split(' ');
@@ -100,8 +100,8 @@ namespace RGR2
         }
         static void WriteWords(List<string> words, int len)
         {
-            Directory.CreateDirectory("temp");
-            using (StreamWriter streamWriter = new StreamWriter($"temp\\Lenght{len}.txt", false, Encoding.ASCII))
+            Directory.CreateDirectory("sources\\temp");
+            using (StreamWriter streamWriter = new StreamWriter($"sources\\temp\\Lenght{len}.txt", false, Encoding.ASCII))
             {
                 foreach (string word in words)
                     streamWriter.WriteLine(word);
