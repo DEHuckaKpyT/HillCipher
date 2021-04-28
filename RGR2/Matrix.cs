@@ -24,49 +24,51 @@ namespace RGR2
         public void CheckWord()
         {
             Console.WriteLine($"{number + 1}.{word}");
+            string[] dictionaryEVEN = GetLenghtWordsAndSort(word.Length);
             Directory.CreateDirectory("EncryptedWords");
             using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))
             {
-                foreach (var enWord in GetLenghtWords(word.Length))
+                List<int[,]> wordMatrixes = GetMatrixesFromCryptWord(word);
+                foreach (int[,] matrix in allMatrixes)
                 {
-                    List<int[,]> matrixes = GetMatrixes(enWord);
-                    Console.WriteLine(enWord);
-                    foreach (int[,] matrix in allMatrixes)
-                    {
-                        string testWord = "";
+                    string testWord = "";
 
-                        foreach (var i in matrixes)
-                        {
-                            int[,] c = MatrixMultiplication(i, matrix);
-                            testWord += (char)((c[0, 0] % 26) + 97);
-                            testWord += (char)((c[0, 1] % 26) + 97);
-                            if (!word.Substring(0, testWord.Length).Equals(testWord)) break;
-                        }
-                        if (word.Equals(testWord))
-                        {
-                            Console.WriteLine($"{enWord} {matrix[0,0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
-                            streamWriter.WriteLine($"{enWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
-                        }
+                    foreach (var wordMatrix in wordMatrixes)
+                    {
+                        int[,] c = MatrixMultiplication(wordMatrix, matrix);
+                        testWord += (char)((c[0, 0] % 26) + 97);
+                        testWord += (char)((c[0, 1] % 26) + 97);
+                    }
+
+                    if (Array.BinarySearch(dictionaryEVEN, testWord) >=0 )
+                    {
+                        Console.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                        streamWriter.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                     }
                 }
             }
             ev.Set();
         }
-        public static List<string> GetLenghtWords(int lenght)
+        public static string[] GetLenghtWordsAndSort(int lenght)
         {
             List<string> words = new List<string>();
             using (StreamReader streamReader = new StreamReader($"temp\\Lenght{lenght}.txt"))
                 while (!streamReader.EndOfStream)
                     words.Add(streamReader.ReadLine().ToLower());
-            return words;
+            string[] resultWords = words.ToArray();
+            Array.Sort(resultWords);
+            return resultWords;
         }
-        public static string[] GetDicWords(string path)
+        public static string[] GetDicWordsAndSort(string path)
         {
             List<string> words = new List<string>();
             using (StreamReader streamReader = new StreamReader(path))
                 while (!streamReader.EndOfStream)
                     words.Add(streamReader.ReadLine().ToLower());
-            return words.ToArray();
+
+            string[] resultWords = words.ToArray();
+            Array.Sort(resultWords);
+            return resultWords;
         }
         public static string[] GetStartWords(string path)
         {
@@ -76,7 +78,7 @@ namespace RGR2
                     startWords.Add(stream.ReadLine());
             return startWords.ToArray();
         }
-        public static List<int[,]> GetMatrixes(string word)
+        public static List<int[,]> GetMatrixesFromCryptWord(string word)
         {
             List<int[,]> wordsList = new List<int[,]>();//список матриц 1х2
 
@@ -87,40 +89,17 @@ namespace RGR2
         }
         public static int[,] MatrixMultiplication(int[,] matrixA, int[,] matrixB)
         {
-            if (matrixA.ColumnsCount() != matrixB.RowsCount())
-            {
-                throw new Exception("Умножение не возможно! Количество столбцов первой матрицы не равно количеству строк второй матрицы.");
-            }
+            int[,] matrixC = new int[1, 2];
 
-            var matrixC = new int[matrixA.RowsCount(), matrixB.ColumnsCount()];
-
-            for (var i = 0; i < matrixA.RowsCount(); i++)
-            {
-                for (var j = 0; j < matrixB.ColumnsCount(); j++)
+            for (int i = 0; i < 1; i++)
+                for (int j = 0; j < 2; j++)
                 {
                     matrixC[i, j] = 0;
-
-                    for (var k = 0; k < matrixA.ColumnsCount(); k++)
-                    {
+                    for (int k = 0; k < 2; k++)
                         matrixC[i, j] += matrixA[i, k] * matrixB[k, j];
-                    }
                 }
-            }
-            return matrixC;
-        }
-    }
-    static class MatrixExt
-    {
-        // метод расширения для получения количества строк матрицы
-        public static int RowsCount(this int[,] matrix)
-        {
-            return matrix.GetUpperBound(0) + 1;
-        }
 
-        // метод расширения для получения количества столбцов матрицы
-        public static int ColumnsCount(this int[,] matrix)
-        {
-            return matrix.GetUpperBound(1) + 1;
+            return matrixC;
         }
     }
 }

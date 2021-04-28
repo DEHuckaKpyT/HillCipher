@@ -14,8 +14,8 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWords("NotBadDic457k.txt");
-            SortWords(Matrix.dicWords, 4, 6, 8, 10, 12);//здесь пишется длина всех встречающихся слов (это вся)
+            Matrix.dicWords = Matrix.GetDicWordsAndSort("NotBadDic457k.txt");
+            SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
             Matrix.allMatrixes = GetEncryptMatrixes();
 
             DecryptHaHa(1, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
