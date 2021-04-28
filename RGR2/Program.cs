@@ -14,11 +14,11 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWords("NotBadDic457k.txt");
-            SortWords(Matrix.dicWords, 4, 6, 8, 10, 12);//здесь пишется длина всех встречающихся слов (это вся)
+            Matrix.dicWords = Matrix.GetDicWords("sources\\dic1k.txt");
+            SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
             Matrix.allMatrixes = GetEncryptMatrixes();
 
-            DecryptHaHa(1, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
+            DecryptHaHa(7, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
 
             StrucFiles();
 
@@ -53,11 +53,22 @@ namespace RGR2
         static List<int[,]> GetEncryptMatrixes()
         {
             List<int[,]> matrixes = new List<int[,]>();
-            for (int i1 = 0; i1 < 26; i1++)
-                for (int i2 = 0; i2 < 26; i2++)
-                    for (int i3 = 0; i3 < 26; i3++)
-                        for (int i4 = 0; i4 < 26; i4++)
-                            matrixes.Add(new int[2, 2] { { i1, i2 }, { i3, i4 } });
+            string[] tempStrings;
+            int[,] tempMatrix;
+
+            using (StreamReader reader = new StreamReader("sources\\EncryptMatrixes.txt"))
+                while (!reader.EndOfStream)
+                {
+                    tempStrings = reader.ReadLine().Split(' ');
+
+                    tempMatrix = new int[2, 2]
+                    {
+                        { int.Parse(tempStrings[0]), int.Parse(tempStrings[1]) },
+                        { int.Parse(tempStrings[2]), int.Parse(tempStrings[3]) }
+                    };
+                    matrixes.Add(tempMatrix);
+                }
+
             return matrixes;
         }
         static void SortWords(string[] wordsList, params int[] lengths)
@@ -79,8 +90,8 @@ namespace RGR2
         }
         static void WriteWords(List<string> words, int len)
         {
-            Directory.CreateDirectory("temp");
-            using (StreamWriter streamWriter = new StreamWriter($"temp\\Lenght{len}.txt", false, Encoding.ASCII))
+            Directory.CreateDirectory("sources\\temp");
+            using (StreamWriter streamWriter = new StreamWriter($"sources\\temp\\Lenght{len}.txt", false, Encoding.ASCII))
             {
                 foreach (string word in words)
                     streamWriter.WriteLine(word);

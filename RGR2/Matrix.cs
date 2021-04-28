@@ -25,27 +25,60 @@ namespace RGR2
         {
             Console.WriteLine($"{number + 1}.{word}");
             Directory.CreateDirectory("EncryptedWords");
+            StringBuilder tempStringBuilder = new StringBuilder();
+            string tempString;
+            string letters = "abcdefghijklmnopqrstuvwxyz";
             using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))
             {
-                foreach (var enWord in GetLenghtWords(word.Length))
+                foreach (var enWordFromDictionary in GetLenghtWords(word.Length))
                 {
-                    List<int[,]> matrixes = GetMatrixes(enWord);
-                    Console.WriteLine(enWord);
+                    List<int[,]> matrixes = GetMatrixes(enWordFromDictionary);
+                    Console.WriteLine(enWordFromDictionary);
                     foreach (int[,] matrix in allMatrixes)
                     {
-                        string testWord = "";
+                        tempStringBuilder.Clear();
 
                         foreach (var i in matrixes)
                         {
-                            int[,] c = MatrixMultiplication(i, matrix);
-                            testWord += (char)((c[0, 0] % 26) + 97);
-                            testWord += (char)((c[0, 1] % 26) + 97);
-                            if (!word.Substring(0, testWord.Length).Equals(testWord)) break;
+                            int[,] c = MatrixMultiplication(matrix, i);
+                            tempStringBuilder.Append(Convert.ToChar((c[0, 0] % 26) + 'a'));
+                            tempStringBuilder.Append(Convert.ToChar((c[1, 0] % 26) + 'a'));
+                            if (!word.Substring(0, tempStringBuilder.Length).Equals(tempStringBuilder.ToString())) break;
                         }
-                        if (word.Equals(testWord))
+
+                        tempString = tempStringBuilder.ToString();
+                        if (word.Equals(tempString))
                         {
-                            Console.WriteLine($"{enWord} {matrix[0,0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
-                            streamWriter.WriteLine($"{enWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                            Console.WriteLine($"{enWordFromDictionary} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                            streamWriter.WriteLine($"{enWordFromDictionary} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                        }
+                    }
+                }
+                foreach (var enWordFromDictionary in GetLenghtWords(word.Length - 1))
+                {
+                    foreach (var letter in letters)
+                    {
+                        string curEnWordFromDictionary = enWordFromDictionary + letter;
+                        List<int[,]> matrixes = GetMatrixes(curEnWordFromDictionary);
+                        Console.WriteLine(curEnWordFromDictionary);
+                        foreach (int[,] matrix in allMatrixes)
+                        {
+                            tempStringBuilder.Clear();
+
+                            foreach (var i in matrixes)
+                            {
+                                int[,] c = MatrixMultiplication(matrix, i);
+                                tempStringBuilder.Append(Convert.ToChar((c[0, 0] % 26) + 'a'));
+                                tempStringBuilder.Append(Convert.ToChar((c[1, 0] % 26) + 'a'));
+                                if (!word.Substring(0, tempStringBuilder.Length).Equals(tempStringBuilder.ToString())) break;
+                            }
+
+                            tempString = tempStringBuilder.ToString();
+                            if (word.Equals(tempString))
+                            {
+                                Console.WriteLine($"{enWordFromDictionary} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                                streamWriter.WriteLine($"{enWordFromDictionary} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                            }
                         }
                     }
                 }
@@ -55,7 +88,7 @@ namespace RGR2
         public static List<string> GetLenghtWords(int lenght)
         {
             List<string> words = new List<string>();
-            using (StreamReader streamReader = new StreamReader($"temp\\Lenght{lenght}.txt"))
+            using (StreamReader streamReader = new StreamReader($"sources\\temp\\Lenght{lenght}.txt"))
                 while (!streamReader.EndOfStream)
                     words.Add(streamReader.ReadLine().ToLower());
             return words;
@@ -81,7 +114,7 @@ namespace RGR2
             List<int[,]> wordsList = new List<int[,]>();//список матриц 1х2
 
             for (int i = 0; i < word.Length; i += 2)//идём по каждой паре букв в слове
-                wordsList.Add(new int[1, 2] { { word[i] - 97, word[i + 1] - 97 } });//записываем коды букв
+                wordsList.Add(new int[2, 1] { { word[i] - 97 },{ word[i + 1] - 97 } });//записываем коды букв
 
             return wordsList;
         }
