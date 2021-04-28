@@ -25,6 +25,7 @@ namespace RGR2
         {
             Console.WriteLine($"{number + 1}.{word}");
             string[] dictionaryEVEN = GetLenghtWordsAndSort(word.Length);
+            string[] dictionaryODD = GetLenghtWordsAndSort(word.Length - 1);
             Directory.CreateDirectory("EncryptedWords");
             using (StreamWriter streamWriter = new StreamWriter($"EncryptedWords\\{number + 1}.{word}.txt", false, Encoding.ASCII))
             {
@@ -40,7 +41,13 @@ namespace RGR2
                         testWord += (char)((c[0, 1] % 26) + 97);
                     }
 
-                    if (Array.BinarySearch(dictionaryEVEN, testWord) >=0 )
+                    if (Array.BinarySearch(dictionaryEVEN, testWord) >= 0)
+                    {
+                        Console.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                        streamWriter.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
+                    }
+                    testWord = testWord.Substring(0, testWord.Length - 1);
+                    if (Array.BinarySearch(dictionaryODD, testWord) >= 0)
                     {
                         Console.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                         streamWriter.WriteLine($"{testWord} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");

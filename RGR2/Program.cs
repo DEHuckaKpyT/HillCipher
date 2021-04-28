@@ -14,11 +14,11 @@ namespace RGR2
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWordsAndSort("NotBadDic457k.txt");
+            Matrix.dicWords = Matrix.GetDicWordsAndSort("dic10k.txt");
             SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
-            Matrix.allMatrixes = GetEncryptMatrixes();
+            Matrix.allMatrixes = GetDecryptMatrixes();
 
-            DecryptHaHa(1, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
+            DecryptHaHa(3, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
 
             StrucFiles();
 
@@ -58,6 +58,27 @@ namespace RGR2
                     for (int i3 = 0; i3 < 26; i3++)
                         for (int i4 = 0; i4 < 26; i4++)
                             matrixes.Add(new int[2, 2] { { i1, i2 }, { i3, i4 } });
+            return matrixes;
+        }
+        static List<int[,]> GetDecryptMatrixes()
+        {
+            List<int[,]> matrixes = new List<int[,]>();
+            string[] tempStrings;
+            int[,] tempMatrix;
+
+            using (StreamReader reader = new StreamReader("DecryptMatrixes.txt"))
+                while (!reader.EndOfStream)
+                {
+                    tempStrings = reader.ReadLine().Split(' ');
+
+                    tempMatrix = new int[2, 2] 
+                    { 
+                        { int.Parse(tempStrings[0]), int.Parse(tempStrings[1]) }, 
+                        { int.Parse(tempStrings[2]), int.Parse(tempStrings[3]) } 
+                    };
+                    matrixes.Add(tempMatrix);
+                }
+            
             return matrixes;
         }
         static void SortWords(string[] wordsList, params int[] lengths)
