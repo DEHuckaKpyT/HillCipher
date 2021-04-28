@@ -10,15 +10,19 @@ namespace RGR2
 {
     class Program
     {
+        static string StartWords = "startWords.txt";//слова, которые нужно расшифровать
+        static string Dictionary = "sources\\NotBadDic457k.txt";//словарь
+        static int StreamsCount = 7;//количество потоков
+
         static ManualResetEvent[] events;
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWordsAndSort("sources\\NotBadDic457k.txt");
+            Matrix.dicWords = Matrix.GetDicWordsAndSort(Dictionary);
             SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
             Matrix.allMatrixes = GetDecryptMatrixes();
 
-            DecryptHaHa(3, Matrix.GetStartWords("startWords.txt"));//здесь число - количество потоков
+            DecryptHaHa(StreamsCount, Matrix.GetStartWords(StartWords));
 
             StrucFiles();
 

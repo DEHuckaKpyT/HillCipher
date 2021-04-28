@@ -49,6 +49,7 @@ namespace RGR2
                         Console.WriteLine($"{tempString} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                         streamWriter.WriteLine($"{tempString} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                     }
+
                     tempString = tempString.Substring(0, tempString.Length - 1);
                     if (Array.BinarySearch(dictionaryODD, tempString) >= 0)
                     {
