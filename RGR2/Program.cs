@@ -11,7 +11,7 @@ namespace RGR2
     class Program
     {
         static string StartWords = "startWords.txt";//слова, которые нужно расшифровать
-        static string Dictionary = "sources\\NotBadDic457k.txt";//словарь
+        static string Dictionary = "sources\\dic1k.txt";//словарь
         static int StreamsCount = 7;//количество потоков
 
         static ManualResetEvent[] events;
