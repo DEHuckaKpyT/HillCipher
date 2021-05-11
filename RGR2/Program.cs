@@ -11,105 +11,71 @@ namespace RGR2
     class Program
     {
         static string StartWords = "startWords.txt";//слова, которые нужно расшифровать
-        static string Dictionary = "sources\\dic1k.txt";//словарь
-        static int StreamsCount = 7;//количество потоков
+        static string Dictionary = "sources\\NotBadDic457k.txt";//словарь
+        static string Matrixes = "sources\\DecryptMatrixes.txt";//матрицы
+        static int StreamsCount = 3;//количество потоков
 
         static ManualResetEvent[] events;
         static void Main(string[] args)
         {
             CommitNowTime();
-            Matrix.dicWords = Matrix.GetDicWordsAndSort(Dictionary);
-            SortWords(Matrix.dicWords, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);//здесь пишется длина всех встречающихся слов (это вся)
-            Matrix.allMatrixes = GetDecryptMatrixes();
 
-            DecryptHaHa(StreamsCount, Matrix.GetStartWords(StartWords));
+            DecryptHaHa(StreamsCount, StartWords, Matrixes, Dictionary);
 
-            StrucFiles();
+            RefactorResultFiles();
 
             Console.WriteLine("End");
             CommitNowTime();
             ConsoleKeyInfo key = Console.ReadKey();
-            while(key.Key!=ConsoleKey.Escape)
+            while (key.Key != ConsoleKey.Escape)
                 key = Console.ReadKey();
         }
-        static void DecryptHaHa(int streamsCount, string[] startWords)
+        static void DecryptHaHa(int streamsCount, string pathStartWords, string pathAllMatrixes, string pathDictionary)
         {
+            IReaderService readerService = new TextFileReader(pathStartWords);
+            string[] startWords = readerService.ReadStrings().ToArray();
             streamsCount = streamsCount < startWords.Length ? streamsCount : startWords.Length;
             events = new ManualResetEvent[streamsCount];
+            IMatrixService matrixService = new MatrixByFile(new TextFileReader(pathAllMatrixes));
+            Dictionary<int, List<string>> allLengthDictionaries = GetSortedDictionariesForLength(pathDictionary);
 
             for (int i = 0; i < streamsCount; i++)
             {
                 events[i] = new ManualResetEvent(false);
-                Matrix matrix = new Matrix(events[i], i, startWords[i]);
-                new Thread(new ThreadStart(matrix.CheckWord)).Start();
+                ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[i], i, startWords[i],
+                    matrixService.GetMatrixes(), 
+                    allLengthDictionaries[startWords[i].Length].ToArray(),
+                    allLengthDictionaries[startWords[i].Length - 1].ToArray());
+                new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
             }
 
             for (int i = streamsCount; i < startWords.Length; i++)
             {
                 int numb = WaitHandle.WaitAny(events);
                 events[numb].Reset();
-                Matrix matrix = new Matrix(events[numb], i, startWords[i]);
-                new Thread(new ThreadStart(matrix.CheckWord)).Start();
+                ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[numb], i, startWords[i],
+                    matrixService.GetMatrixes(),
+                    allLengthDictionaries[startWords[i].Length].ToArray(),
+                    allLengthDictionaries[startWords[i].Length - 1].ToArray());
+                new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
             }
 
             WaitHandle.WaitAll(events);
         }
-        static List<int[,]> GetEncryptMatrixes()
+        static Dictionary<int, List<string>> GetSortedDictionariesForLength(string path)
         {
-            List<int[,]> matrixes = new List<int[,]>();
-            for (int i1 = 0; i1 < 26; i1++)
-                for (int i2 = 0; i2 < 26; i2++)
-                    for (int i3 = 0; i3 < 26; i3++)
-                        for (int i4 = 0; i4 < 26; i4++)
-                            matrixes.Add(new int[2, 2] { { i1, i2 }, { i3, i4 } });
-            return matrixes;
-        }
-        static List<int[,]> GetDecryptMatrixes()
-        {
-            List<int[,]> matrixes = new List<int[,]>();
-            string[] tempStrings;
-            int[,] tempMatrix;
+            Dictionary<int, List<string>> allLengthDictionaries = new Dictionary<int, List<string>>();
+            IReaderService readerService = new TextFileReader(path);
 
-            using (StreamReader reader = new StreamReader("sources\\DecryptMatrixes.txt"))
-                while (!reader.EndOfStream)
-                {
-                    tempStrings = reader.ReadLine().Split(' ');
-
-                    tempMatrix = new int[2, 2] 
-                    { 
-                        { int.Parse(tempStrings[0]), int.Parse(tempStrings[1]) }, 
-                        { int.Parse(tempStrings[2]), int.Parse(tempStrings[3]) } 
-                    };
-                    matrixes.Add(tempMatrix);
-                }
-            
-            return matrixes;
-        }
-        static void SortWords(string[] wordsList, params int[] lengths)
-        {
-            Dictionary<int, List<string>> lenWords = new Dictionary<int, List<string>>();
-            int maxLenght = lengths.Max();
-
-            for (int i = 1; i <= maxLenght; i++)
-                lenWords.Add(i, new List<string>());
-
-            foreach (string word in wordsList)
-                if (word.Length <= maxLenght) lenWords[word.Length].Add(word);
-
-            foreach (var i in lengths)
+            foreach (string str in readerService.ReadStrings())
             {
-                lenWords[i].Sort();
-                WriteWords(lenWords[i], i);
+                if (!allLengthDictionaries.ContainsKey(str.Length))
+                    allLengthDictionaries.Add(str.Length, new List<string>());
+                allLengthDictionaries[str.Length].Add(str);
             }
-        }
-        static void WriteWords(List<string> words, int len)
-        {
-            Directory.CreateDirectory("sources\\temp");
-            using (StreamWriter streamWriter = new StreamWriter($"sources\\temp\\Lenght{len}.txt", false, Encoding.ASCII))
-            {
-                foreach (string word in words)
-                    streamWriter.WriteLine(word);
-            }
+            foreach (List<string> wordsList in allLengthDictionaries.Values)
+                wordsList.Sort();
+            return allLengthDictionaries;
         }
         static void CommitNowTime()
         {
@@ -117,7 +83,7 @@ namespace RGR2
             using (StreamWriter stream = new StreamWriter("Time.txt", true))
                 stream.WriteLine(DateTime.Now);
         }
-        static void StrucFiles()
+        static void RefactorResultFiles()
         {
             DirectoryInfo dir = new DirectoryInfo("EncryptedWords");
             var files = dir.GetFiles().OrderBy(x => int.Parse(x.Name.Substring(0,x.Name.IndexOf('.'))));
