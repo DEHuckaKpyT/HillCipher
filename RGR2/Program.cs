@@ -22,7 +22,7 @@ namespace RGR2
 
             DecryptHaHa(StreamsCount, StartWords, Matrixes, Dictionary);
 
-            RefactorResultFiles();
+            FileProcessing.RefactorResultFiles();
 
             Console.WriteLine("End");
             CommitNowTime();
@@ -83,41 +83,6 @@ namespace RGR2
             using (StreamWriter stream = new StreamWriter("Time.txt", true))
                 stream.WriteLine(DateTime.Now);
         }
-        static void RefactorResultFiles()
-        {
-            DirectoryInfo dir = new DirectoryInfo("EncryptedWords");
-            var files = dir.GetFiles().OrderBy(x => int.Parse(x.Name.Substring(0,x.Name.IndexOf('.'))));
-
-            Directory.CreateDirectory("Total");
-            using (StreamWriter stream = new StreamWriter("Total\\EnWords.txt", false))
-                foreach (var file in files)
-                    RewriteFiles(stream, file.FullName, file.Name);
-        }
-        static void RewriteFiles(StreamWriter writer, string path, string name)
-        {
-            List<string> strings = new List<string>();
-            using (StreamReader stream = new StreamReader(path))
-                while (!stream.EndOfStream)
-                    strings.Add(stream.ReadLine());
-
-            SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
-            foreach (var str in strings)
-            {
-                string[] strs = str.Split(' ');
-                if (!dic.ContainsKey(strs[0]))
-                    dic.Add(strs[0], "{" + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}");
-                else
-                    dic[strs[0]] = dic[strs[0]].Replace("}", "") + ", " + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}";
-            }
-
-            Directory.CreateDirectory("EncryptedStructuredWords");
-            writer.WriteLine(name.Replace(".txt", ""));
-            using (StreamWriter stream = new StreamWriter($"EncryptedStructuredWords\\{name}", false))
-                foreach (var i in dic)
-                {
-                    stream.WriteLine(i.Key + " " + i.Value);
-                    writer.WriteLine(i.Key);
-                }
-        }
+        
     }
 }

@@ -44,6 +44,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileProcessing.cs" />
     <Compile Include="IMatrixService.cs" />
     <Compile Include="ProcessThreadGroundService.cs" />
     <Compile Include="IReaderService.cs" />
