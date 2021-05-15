@@ -10,19 +10,28 @@ namespace RGR2
     //TODO доделать этот класс
     class FileProcessing
     {
+        public string PathDirectoryEncryptedWords { get; private set; }
+        public string PathDirectoryEncryptedStructuredWords { get; private set; }
+        public string TotalDirectory { get; private set; }
 
-        public static void RefactorResultFiles()
+        public FileProcessing(string pathDirectoryEncryptedWords, string pathDirectoryEncryptedStructuredWords, string totalDirectory)
         {
-            DirectoryInfo dir = new DirectoryInfo("EncryptedWords");
+            PathDirectoryEncryptedWords = pathDirectoryEncryptedWords;
+            PathDirectoryEncryptedStructuredWords = pathDirectoryEncryptedStructuredWords;
+            TotalDirectory = totalDirectory;
+        }
+        public void RefactorResultFiles()
+        {
+            DirectoryInfo dir = new DirectoryInfo(PathDirectoryEncryptedWords);
             var files = dir.GetFiles().OrderBy(x => int.Parse(x.Name.Substring(0, x.Name.IndexOf('.'))));
 
-            Directory.CreateDirectory("Total");
-            using (StreamWriter stream = new StreamWriter("Total\\EnWords.txt", false))
-            using (StreamWriter stream2 = new StreamWriter("Total\\EnWords2.txt", false))
+            Directory.CreateDirectory(TotalDirectory);
+            using (StreamWriter stream = new StreamWriter(TotalDirectory + "\\FinalEncryptdeWords.txt", false))
+            using (StreamWriter stream2 = new StreamWriter(TotalDirectory + "\\FinalEncryptdeWordsToString.txt", false))
                 foreach (var file in files)
                     RewriteFiles(stream, stream2, file.FullName, file.Name);
         }
-        static void RewriteFiles(StreamWriter writer, StreamWriter writer2, string path, string name)
+        void RewriteFiles(StreamWriter writer, StreamWriter writer2, string path, string name)
         {
             IReaderService readerService = new TextFileReader(path);
             List<string> strings = readerService.ReadStrings();
@@ -37,10 +46,10 @@ namespace RGR2
                     dic[strs[0]] = dic[strs[0]].Replace("}", "") + ", " + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}";
             }
 
-            Directory.CreateDirectory("EncryptedStructuredWords");
+            Directory.CreateDirectory(PathDirectoryEncryptedStructuredWords);
             writer.WriteLine(name.Replace(".txt", ""));
             writer2.Write(name.Replace(".txt", " "));
-            using (StreamWriter stream = new StreamWriter($"EncryptedStructuredWords\\{name}", false))
+            using (StreamWriter stream = new StreamWriter(PathDirectoryEncryptedStructuredWords + $"\\{name}", false))
                 foreach (var i in dic)
                 {
                     stream.WriteLine(i.Key + " " + i.Value);
