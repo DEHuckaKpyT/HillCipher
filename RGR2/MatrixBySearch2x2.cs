@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RGR2
 {
-    class MatrixBySearch : IMatrixService
+    class MatrixBySearch2x2 : IMatrixService
     {
         public int MaxValue { get; }
-        public MatrixBySearch(int maxValue)
+        public MatrixBySearch2x2(int maxValue)
         {
             MaxValue = maxValue;
         }

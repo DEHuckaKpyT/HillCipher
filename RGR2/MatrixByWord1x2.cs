@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RGR2
 {
-    class MatrixByWord : IMatrixService
+    class MatrixByWord1x2 : IMatrixService
     {
         public string Word { get; }
-        public MatrixByWord(string word)
+        public MatrixByWord1x2(string word)
         {
             Word = word;
         }

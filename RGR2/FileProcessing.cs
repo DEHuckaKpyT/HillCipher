@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 namespace RGR2
 {
     //TODO доделать этот класс
-    static class FileProcessing
+    class FileProcessing
     {
+
         public static void RefactorResultFiles()
         {
             DirectoryInfo dir = new DirectoryInfo("EncryptedWords");
@@ -17,10 +18,11 @@ namespace RGR2
 
             Directory.CreateDirectory("Total");
             using (StreamWriter stream = new StreamWriter("Total\\EnWords.txt", false))
+            using (StreamWriter stream2 = new StreamWriter("Total\\EnWords2.txt", false))
                 foreach (var file in files)
-                    RewriteFiles(stream, file.FullName, file.Name);
+                    RewriteFiles(stream, stream2, file.FullName, file.Name);
         }
-        static void RewriteFiles(StreamWriter writer, string path, string name)
+        static void RewriteFiles(StreamWriter writer, StreamWriter writer2, string path, string name)
         {
             IReaderService readerService = new TextFileReader(path);
             List<string> strings = readerService.ReadStrings();
@@ -37,11 +39,13 @@ namespace RGR2
 
             Directory.CreateDirectory("EncryptedStructuredWords");
             writer.WriteLine(name.Replace(".txt", ""));
+            writer2.Write(name.Replace(".txt", " "));
             using (StreamWriter stream = new StreamWriter($"EncryptedStructuredWords\\{name}", false))
                 foreach (var i in dic)
                 {
                     stream.WriteLine(i.Key + " " + i.Value);
                     writer.WriteLine(i.Key);
+                    writer2.Write(i.Key + " ");
                 }
         }
     }

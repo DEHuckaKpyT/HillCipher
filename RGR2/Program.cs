@@ -18,9 +18,13 @@ namespace RGR2
         static ManualResetEvent[] events;
         static void Main(string[] args)
         {
-            CommitNowTime();
+            Decrypter decrypter = new DecrypterWithStreams(StreamsCount,
+                new TextFileReader(StartWords).ReadStrings().ToArray(),
+                GetSortedDictionariesForLength(Dictionary),
+                new MatrixByFile2x2(new TextFileReader(Matrixes)).GetMatrixes());
+            decrypter.Decrypt();
 
-            DecryptHaHa(StreamsCount, StartWords, Matrixes, Dictionary);
+
 
             FileProcessing.RefactorResultFiles();
 
@@ -29,38 +33,6 @@ namespace RGR2
             ConsoleKeyInfo key = Console.ReadKey();
             while (key.Key != ConsoleKey.Escape)
                 key = Console.ReadKey();
-        }
-        static void DecryptHaHa(int streamsCount, string pathStartWords, string pathAllMatrixes, string pathDictionary)
-        {
-            IReaderService readerService = new TextFileReader(pathStartWords);
-            string[] startWords = readerService.ReadStrings().ToArray();
-            streamsCount = streamsCount < startWords.Length ? streamsCount : startWords.Length;
-            events = new ManualResetEvent[streamsCount];
-            IMatrixService matrixService = new MatrixByFile(new TextFileReader(pathAllMatrixes));
-            Dictionary<int, List<string>> allLengthDictionaries = GetSortedDictionariesForLength(pathDictionary);
-
-            for (int i = 0; i < streamsCount; i++)
-            {
-                events[i] = new ManualResetEvent(false);
-                ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[i], i, startWords[i],
-                    matrixService.GetMatrixes(), 
-                    allLengthDictionaries[startWords[i].Length].ToArray(),
-                    allLengthDictionaries[startWords[i].Length - 1].ToArray());
-                new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
-            }
-
-            for (int i = streamsCount; i < startWords.Length; i++)
-            {
-                int numb = WaitHandle.WaitAny(events);
-                events[numb].Reset();
-                ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[numb], i, startWords[i],
-                    matrixService.GetMatrixes(),
-                    allLengthDictionaries[startWords[i].Length].ToArray(),
-                    allLengthDictionaries[startWords[i].Length - 1].ToArray());
-                new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
-            }
-
-            WaitHandle.WaitAll(events);
         }
         static Dictionary<int, List<string>> GetSortedDictionariesForLength(string path)
         {

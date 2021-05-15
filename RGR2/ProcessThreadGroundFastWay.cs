@@ -28,7 +28,7 @@ namespace RGR2
             string tempString;
             List<string> found = new List<string>();
 
-            IMatrixService matrixService = new MatrixByWord(Word);
+            IMatrixService matrixService = new MatrixByWord1x2(Word);
             List<int[,]> wordMatrixes = matrixService.GetMatrixes();
 
             foreach (int[,] matrix in AllMatrixes)

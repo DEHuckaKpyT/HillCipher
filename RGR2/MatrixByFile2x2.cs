@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RGR2
 {
-    class MatrixByFile : IMatrixService
+    class MatrixByFile2x2 : IMatrixService
     {
         public IReaderService Reader { get; }
-        public MatrixByFile(IReaderService reader)
+        public MatrixByFile2x2(IReaderService reader)
         {
             Reader = reader;
         }

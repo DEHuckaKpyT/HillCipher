@@ -44,15 +44,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decrypter.cs" />
+    <Compile Include="DecrypterWithStreams.cs" />
     <Compile Include="FileProcessing.cs" />
     <Compile Include="IMatrixService.cs" />
     <Compile Include="ProcessThreadGroundService.cs" />
     <Compile Include="IReaderService.cs" />
     <Compile Include="IWriterService.cs" />
     <Compile Include="Matrix.cs" />
-    <Compile Include="MatrixByFile.cs" />
-    <Compile Include="MatrixBySearch.cs" />
-    <Compile Include="MatrixByWord.cs" />
+    <Compile Include="MatrixByFile2x2.cs" />
+    <Compile Include="MatrixBySearch2x2.cs" />
+    <Compile Include="MatrixByWord1x2.cs" />
     <Compile Include="ProcessThreadGroundFastWay.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
