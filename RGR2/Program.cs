@@ -11,8 +11,8 @@ namespace RGR2
     class Program
     {
         static string StartWords = "startWords.txt";//слова, которые нужно расшифровать
-        static string Dictionary = "sources\\dic1k.txt";//словарь
-        static int StreamsCount = 7;//количество потоков
+        static string Dictionary = "sources\\NotBadDic457k.txt";//словарь
+        static int StreamsCount = 3;//количество потоков
 
         static ManualResetEvent[] events;
         static void Main(string[] args)
@@ -126,6 +126,9 @@ namespace RGR2
             using (StreamWriter stream = new StreamWriter("Total\\EnWords.txt", false))
                 foreach (var file in files)
                     RewriteFiles(stream, file.FullName, file.Name);
+            using (StreamWriter stream = new StreamWriter("Total\\EnWords2.txt", false))
+                foreach (var file in files)
+                    RewriteFiles2(stream, file.FullName, file.Name);
         }
         static void RewriteFiles(StreamWriter writer, string path, string name)
         {
@@ -151,6 +154,29 @@ namespace RGR2
                 {
                     stream.WriteLine(i.Key + " " + i.Value);
                     writer.WriteLine(i.Key);
+                }
+        }
+        static void RewriteFiles2(StreamWriter writer, string path, string name)
+        {
+            List<string> strings = new List<string>();
+            using (StreamReader stream = new StreamReader(path))
+                while (!stream.EndOfStream)
+                    strings.Add(stream.ReadLine());
+
+            SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
+            foreach (var str in strings)
+            {
+                string[] strs = str.Split(' ');
+                if (!dic.ContainsKey(strs[0]))
+                    dic.Add(strs[0], "{" + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}");
+                else
+                    dic[strs[0]] = dic[strs[0]].Replace("}", "") + ", " + $"{strs[1]} {strs[2]} {strs[3]} {strs[4]}" + "}";
+            }
+
+            writer.Write(name.Replace(".txt", "") + " ");
+                foreach (var i in dic)
+                {
+                    writer.Write(i.Key + "  ");
                 }
         }
     }
