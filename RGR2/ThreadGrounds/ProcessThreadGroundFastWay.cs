@@ -25,28 +25,7 @@ namespace RGR2
         public override void TryToDecryptWord()
         {
             Console.WriteLine($"{Number + 1}.{Word}");
-            StringBuilder tempStringBuilder = new StringBuilder();
-            string tempString;
-            List<string> found = new List<string>();
-
-            IMatrixService matrixService = new MatrixByWord1x2(Word);
-            List<int[,]> wordMatrixes = matrixService.GetMatrixes();
-
-            foreach (int[,] matrix in AllMatrixes)
-            {
-                tempStringBuilder.Clear();
-
-                foreach (var wordMatrix in wordMatrixes)
-                {
-                    int[,] c = Matrix.MatrixMultiplication(wordMatrix, matrix);
-                    tempStringBuilder.Append(Convert.ToChar((c[0, 0] % 26) + 'a'));
-                    tempStringBuilder.Append(Convert.ToChar((c[0, 1] % 26) + 'a'));
-                }
-                tempString = tempStringBuilder.ToString();
-
-                CheckTempWord(DictionaryEvenLength, found, tempString, matrix);
-                CheckTempWord(DictionaryOddLength, found, tempString.Substring(0, tempString.Length - 1), matrix);
-            }
+            List<string> found = FindWords();
 
             Directory.CreateDirectory(PathDirectoryEncryptedWords);
             IWriterService writerService = new TextFileWriterToColumn(PathDirectoryEncryptedWords + $"\\{Number + 1}.{Word}.txt");
@@ -62,6 +41,31 @@ namespace RGR2
                 Console.WriteLine($"{tempString} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
                 found.Add($"{tempString} {matrix[0, 0]} {matrix[0, 1]} {matrix[1, 0]} {matrix[1, 1]}");
             }
+        }
+
+        List<string> FindWords()
+        {
+            List<string> found = new List<string>();
+            StringBuilder tempStringBuilder = new StringBuilder();
+            string tempString;
+
+            foreach (int[,] matrix in AllMatrixes)
+            {
+                tempStringBuilder.Clear();
+
+                foreach (var wordMatrix in new MatrixByWord1x2(Word).GetMatrixes())
+                {
+                    int[,] c = Matrix.MatrixMultiplication(wordMatrix, matrix);
+                    tempStringBuilder.Append(Convert.ToChar((c[0, 0] % 26) + 'a'));
+                    tempStringBuilder.Append(Convert.ToChar((c[0, 1] % 26) + 'a'));
+                }
+                tempString = tempStringBuilder.ToString();
+
+                CheckTempWord(DictionaryEvenLength, found, tempString, matrix);
+                CheckTempWord(DictionaryOddLength, found, tempString.Substring(0, tempString.Length - 1), matrix);
+            }
+
+            return found;
         }
     }
 }
