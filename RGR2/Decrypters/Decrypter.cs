@@ -12,8 +12,8 @@ namespace RGR2
         public string[] StartWords { get; private protected set; }
         public Dictionary<int, List<string>> AllLengthDictionaries { get; private protected set; }
         public List<int[,]> UsingMatrixes { get; private protected set; }
-
+        public string PathDirectoryEncryptedWords { get; private protected set; }
+        public IAnswerProcessing AnswerProcessing { get; private protected set; }
         public abstract void Decrypt();
-        
     }
 }

@@ -18,15 +18,16 @@ namespace RGR2
         static ManualResetEvent[] events;
         static void Main(string[] args)
         {
+            CommitNowTime();
+
             Decrypter decrypter = new DecrypterWithStreams(StreamsCount,
                 new TextFileReader(StartWords).ReadStrings().ToArray(),
-                GetSortedDictionariesForLength(Dictionary),
-                new MatrixByFile2x2(new TextFileReader(Matrixes)).GetMatrixes());
+                new TextFileReader(Dictionary).ReadStrings(),
+                new MatrixByFile2x2(new TextFileReader(Matrixes)).GetMatrixes(),
+                "EncryptedWords",
+                new FileProcessing("EncryptedWords", "EncryptedStructedWords", "Total"));
+
             decrypter.Decrypt();
-
-
-
-            FileProcessing.RefactorResultFiles();
 
             Console.WriteLine("End");
             CommitNowTime();
@@ -34,27 +35,11 @@ namespace RGR2
             while (key.Key != ConsoleKey.Escape)
                 key = Console.ReadKey();
         }
-        static Dictionary<int, List<string>> GetSortedDictionariesForLength(string path)
-        {
-            Dictionary<int, List<string>> allLengthDictionaries = new Dictionary<int, List<string>>();
-            IReaderService readerService = new TextFileReader(path);
-
-            foreach (string str in readerService.ReadStrings())
-            {
-                if (!allLengthDictionaries.ContainsKey(str.Length))
-                    allLengthDictionaries.Add(str.Length, new List<string>());
-                allLengthDictionaries[str.Length].Add(str);
-            }
-            foreach (List<string> wordsList in allLengthDictionaries.Values)
-                wordsList.Sort();
-            return allLengthDictionaries;
-        }
         static void CommitNowTime()
         {
             Console.WriteLine(DateTime.Now);
             using (StreamWriter stream = new StreamWriter("Time.txt", true))
                 stream.WriteLine(DateTime.Now);
         }
-        
     }
 }

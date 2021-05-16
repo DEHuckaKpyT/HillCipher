@@ -15,6 +15,7 @@ namespace RGR2
         public List<int[,]> AllMatrixes { get; private protected set; }
         public string[] DictionaryEvenLength { get; private protected set; }
         public string[] DictionaryOddLength { get; private protected set; }
+        public string PathDirectoryEncryptedWords { get; private protected set; }
         public abstract void TryToDecryptWord();
     }
 }

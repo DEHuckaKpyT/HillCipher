@@ -12,13 +12,16 @@ namespace RGR2
         public int StreamsCount { get; private set; }
 
         ManualResetEvent[] events;
-        public DecrypterWithStreams(int streamsCount, string[] startWords, Dictionary<int, List<string>> allLengthDictionaries, List<int[,]> possibleMatrixes)
+        public DecrypterWithStreams(int streamsCount, string[] startWords, List<string> dictionary, 
+            List<int[,]> possibleMatrixes, string pathDirectoryEncryptedWords, IAnswerProcessing answerProcessing)
         {
+            PathDirectoryEncryptedWords = pathDirectoryEncryptedWords;
             StartWords = startWords;
-            AllLengthDictionaries = allLengthDictionaries;
+            AllLengthDictionaries = GetSortedDictionariesForLength(dictionary);
             UsingMatrixes = possibleMatrixes;
             StreamsCount = streamsCount < startWords.Length ? streamsCount : startWords.Length;
             events = new ManualResetEvent[StreamsCount];
+            AnswerProcessing = answerProcessing;
         }
         public override void Decrypt()
         {
@@ -28,7 +31,9 @@ namespace RGR2
                 ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[i], i, StartWords[i],
                     UsingMatrixes,
                     AllLengthDictionaries[StartWords[i].Length].ToArray(),
-                    AllLengthDictionaries[StartWords[i].Length - 1].ToArray());
+                    AllLengthDictionaries[StartWords[i].Length - 1].ToArray(),
+                    PathDirectoryEncryptedWords);
+
                 new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
             }
 
@@ -39,11 +44,28 @@ namespace RGR2
                 ProcessThreadGroundService treadGrond = new ProcessThreadGroundFastWay(events[numb], i, StartWords[i],
                     UsingMatrixes,
                     AllLengthDictionaries[StartWords[i].Length].ToArray(),
-                    AllLengthDictionaries[StartWords[i].Length - 1].ToArray());
+                    AllLengthDictionaries[StartWords[i].Length - 1].ToArray(),
+                    PathDirectoryEncryptedWords);
                 new Thread(new ThreadStart(treadGrond.TryToDecryptWord)).Start();
             }
-
             WaitHandle.WaitAll(events);
+
+            AnswerProcessing.StructResult();
+        }
+        Dictionary<int, List<string>> GetSortedDictionariesForLength(List<string> dictionary)
+        {
+            Dictionary<int, List<string>> allLengthDictionaries = new Dictionary<int, List<string>>();
+
+            foreach (string str in dictionary)
+            {
+                if (!allLengthDictionaries.ContainsKey(str.Length))
+                    allLengthDictionaries.Add(str.Length, new List<string>());
+                allLengthDictionaries[str.Length].Add(str);
+            }
+            foreach (List<string> wordsList in allLengthDictionaries.Values)
+                wordsList.Sort();
+
+            return allLengthDictionaries;
         }
     }
 }

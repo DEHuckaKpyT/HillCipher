@@ -11,7 +11,7 @@ namespace RGR2
     class ProcessThreadGroundFastWay : ProcessThreadGroundService
     {
         public ProcessThreadGroundFastWay(ManualResetEvent resetEvent, int num, string word, List<int[,]> allMatrixes,
-            string[] evenDictionary, string[] oddDictionary)
+            string[] evenDictionary, string[] oddDictionary, string pathDirectoryEncryptedWords)
         {
             ResetEvent = resetEvent;
             Number = num;
@@ -19,6 +19,7 @@ namespace RGR2
             AllMatrixes = allMatrixes;
             DictionaryEvenLength = evenDictionary;
             DictionaryOddLength = oddDictionary;
+            PathDirectoryEncryptedWords = pathDirectoryEncryptedWords;
         }
 
         public override void TryToDecryptWord()
@@ -47,8 +48,8 @@ namespace RGR2
                 CheckTempWord(DictionaryOddLength, found, tempString.Substring(0, tempString.Length - 1), matrix);
             }
 
-            Directory.CreateDirectory("EncryptedWords");
-            IWriterService writerService = new TextFileWriter($"EncryptedWords\\{Number + 1}.{Word}.txt");
+            Directory.CreateDirectory(PathDirectoryEncryptedWords);
+            IWriterService writerService = new TextFileWriterToColumn(PathDirectoryEncryptedWords + $"\\{Number + 1}.{Word}.txt");
             writerService.WriteStrings(found);
 
             ResetEvent.Set();

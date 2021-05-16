@@ -5,20 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RGR2
+namespace RGR2.Writers
 {
-    class TextFileWriter : IWriterService
+    class TextFileWriterToRow : IWriterService
     {
         public string Path { get; }
         public bool Rewrite { get; }
         public Encoding Encoding { get; }
-        public TextFileWriter(string path, bool rewrite = true)
+        public TextFileWriterToRow(string path, bool rewrite = true)
         {
             Path = path;
             Rewrite = rewrite;
             Encoding = Encoding.ASCII;
         }
-        public TextFileWriter(string path, Encoding encoding, bool rewrite = true)
+        public TextFileWriterToRow(string path, Encoding encoding, bool rewrite = true)
         {
             Path = path;
             Encoding = encoding;
@@ -28,7 +28,7 @@ namespace RGR2
         {
             using (StreamWriter writer = new StreamWriter(Path, Rewrite, Encoding))
                 foreach (string str in strings)
-                    writer.WriteLine(str);
+                    writer.Write(str);
         }
     }
 }
