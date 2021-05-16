@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace RGR2
 {
-    //TODO доделать этот класс
     class FileProcessing : IAnswerProcessing
     {
         public string PathDirectoryEncryptedWords { get; private set; }
@@ -33,7 +32,7 @@ namespace RGR2
 
             Directory.CreateDirectory(PathTotalDirectory);
             new TextFileWriterToColumn(PathTotalDirectory + "\\FinalEncryptdeWordsToColumn.txt").WriteStrings(finalEncryptdeWordsToColumn);
-            new TextFileWriterToColumn(PathTotalDirectory + "\\finalEncryptdeWordsToRow.txt").WriteStrings(finalEncryptdeWordsToRow);
+            new TextFileWriterToRow(PathTotalDirectory + "\\finalEncryptdeWordsToRow.txt").WriteStrings(finalEncryptdeWordsToRow);
         }
         void RefactorFiles(List<string> finalEncryptdeWordsToColumn, List<string> finalEncryptdeWordsToRow, 
             string filePath, string fileName)
