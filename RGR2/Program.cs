@@ -15,7 +15,6 @@ namespace RGR2
         static string Matrixes = "sources\\DecryptMatrixes.txt";//матрицы
         static int StreamsCount = 3;//количество потоков
 
-        static ManualResetEvent[] events;
         static void Main(string[] args)
         {
             CommitNowTime();
