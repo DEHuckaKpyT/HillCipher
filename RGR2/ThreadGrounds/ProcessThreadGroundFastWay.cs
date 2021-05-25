@@ -55,7 +55,7 @@ namespace RGR2
 
                 foreach (var wordMatrix in new MatrixByWord1x2(Word).GetMatrixes())
                 {
-                    int[,] c = Matrix.MatrixMultiplication(wordMatrix, matrix);
+                    int[,] c = Matrix.MatrixMultiplication1x2and2x2(wordMatrix, matrix);
                     tempStringBuilder.Append(Convert.ToChar((c[0, 0] % 26) + 'a'));
                     tempStringBuilder.Append(Convert.ToChar((c[0, 1] % 26) + 'a'));
                 }

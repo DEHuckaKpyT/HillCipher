@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RGR2
 {
-    static class Matrix
+    public static class Matrix
     {
-        public static int[,] MatrixMultiplication(int[,] matrixA, int[,] matrixB)
+        public static int[,] MatrixMultiplication1x2and2x2(int[,] matrixA, int[,] matrixB)
         {
             int[,] matrixC = new int[1, 2];
 
